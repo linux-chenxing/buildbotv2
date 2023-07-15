@@ -1,0 +1,26 @@
+name: linux-chenxing kernel build
+
+# Controls when the workflow will run
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: linux-chenxing/linux
+      - name: Install packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: gcc-arm-linux-gnueabihf build-essential ccache
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+      - name: Build kernel
+        run: |
+          sudo apt-get install ccache
+          export PATH=/usr/lib/ccache:$PATH
+          echo $PATH
+          make ARCH=arm mstar_defconfig
+          make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j$(nproc)
